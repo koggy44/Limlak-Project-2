@@ -1,0 +1,491 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Limlak DT Sacco API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: stats
+    description: Sacco statistics
+  - name: products
+    description: Loan and savings products
+  - name: faqs
+    description: FAQ entries
+  - name: jobs
+    description: Career job listings
+  - name: contact
+    description: Contact form
+  - name: membership
+    description: Membership application
+  - name: careers
+    description: Career application
+  - name: loans
+    description: Loan calculator
+  - name: news
+    description: News and announcements
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /stats:
+    get:
+      operationId: getSaccoStats
+      tags: [stats]
+      summary: Get SACCO key statistics
+      responses:
+        "200":
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaccoStats"
+
+  /products:
+    get:
+      operationId: getProducts
+      tags: [products]
+      summary: List all products
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: ["string", "null"]
+            enum: [loans, savings, mobile, null]
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /products/featured:
+    get:
+      operationId: getFeaturedProducts
+      tags: [products]
+      summary: Get featured products for homepage
+      responses:
+        "200":
+          description: Featured products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /faqs:
+    get:
+      operationId: getFaqs
+      tags: [faqs]
+      summary: Get all FAQs
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: ["string", "null"]
+            enum: [joining, loans, savings, digital, null]
+      responses:
+        "200":
+          description: FAQ list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Faq"
+
+  /jobs:
+    get:
+      operationId: getJobs
+      tags: [jobs]
+      summary: Get all job openings
+      responses:
+        "200":
+          description: Job listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+
+  /news:
+    get:
+      operationId: getNews
+      tags: [news]
+      summary: Get latest news and announcements
+      responses:
+        "200":
+          description: News items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewsItem"
+
+  /loans/calculate:
+    post:
+      operationId: calculateLoan
+      tags: [loans]
+      summary: Calculate loan repayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoanCalculationInput"
+      responses:
+        "200":
+          description: Calculation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoanCalculationResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [contact]
+      summary: Submit a contact form inquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInput"
+      responses:
+        "201":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionResult"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /membership/apply:
+    post:
+      operationId: applyMembership
+      tags: [membership]
+      summary: Submit a membership application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MembershipApplicationInput"
+      responses:
+        "201":
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionResult"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /careers/apply:
+    post:
+      operationId: applyCareer
+      tags: [careers]
+      summary: Submit a job application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CareerApplicationInput"
+      responses:
+        "201":
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionResult"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    SaccoStats:
+      type: object
+      properties:
+        membersCount:
+          type: number
+        totalAssetsKes:
+          type: number
+        yearsOfOperation:
+          type: number
+        branchesCount:
+          type: number
+        loansDisbursedKes:
+          type: number
+      required: [membersCount, totalAssetsKes, yearsOfOperation, branchesCount, loansDisbursedKes]
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+          enum: [loans, savings, mobile]
+        name:
+          type: string
+        description:
+          type: string
+        minAmount:
+          type: ["number", "null"]
+        maxAmount:
+          type: ["number", "null"]
+        interestRate:
+          type: ["string", "null"]
+        repaymentPeriod:
+          type: ["string", "null"]
+        eligibility:
+          type: string
+        featured:
+          type: boolean
+        icon:
+          type: string
+      required: [id, category, name, description, eligibility, featured, icon]
+
+    Faq:
+      type: object
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+          enum: [joining, loans, savings, digital]
+        question:
+          type: string
+        answer:
+          type: string
+      required: [id, category, question, answer]
+
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        type:
+          type: string
+          enum: [full-time, part-time, contract, internship]
+        description:
+          type: string
+        qualifications:
+          type: array
+          items:
+            type: string
+        deadline:
+          type: string
+      required: [id, title, department, location, type, description, qualifications, deadline]
+
+    NewsItem:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        date:
+          type: string
+        category:
+          type: string
+      required: [id, title, summary, date, category]
+
+    LoanCalculationInput:
+      type: object
+      properties:
+        principal:
+          type: number
+        annualInterestRate:
+          type: number
+        termMonths:
+          type: number
+      required: [principal, annualInterestRate, termMonths]
+
+    LoanCalculationResult:
+      type: object
+      properties:
+        monthlyPayment:
+          type: number
+        totalPayment:
+          type: number
+        totalInterest:
+          type: number
+        schedule:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentScheduleEntry"
+      required: [monthlyPayment, totalPayment, totalInterest, schedule]
+
+    PaymentScheduleEntry:
+      type: object
+      properties:
+        month:
+          type: number
+        payment:
+          type: number
+        principal:
+          type: number
+        interest:
+          type: number
+        balance:
+          type: number
+      required: [month, payment, principal, interest, balance]
+
+    ContactInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        subject:
+          type: string
+        message:
+          type: string
+          minLength: 10
+      required: [name, email, subject, message]
+
+    MembershipApplicationInput:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        nationalId:
+          type: string
+        kraPin:
+          type: string
+        dateOfBirth:
+          type: string
+        occupation:
+          type: string
+        employer:
+          type: ["string", "null"]
+        nextOfKinName:
+          type: string
+        nextOfKinPhone:
+          type: string
+        nextOfKinRelationship:
+          type: string
+        desiredSavingsPlan:
+          type: string
+        preferredBranch:
+          type: ["string", "null"]
+      required:
+        - firstName
+        - lastName
+        - email
+        - phone
+        - nationalId
+        - kraPin
+        - dateOfBirth
+        - occupation
+        - nextOfKinName
+        - nextOfKinPhone
+        - nextOfKinRelationship
+        - desiredSavingsPlan
+
+    CareerApplicationInput:
+      type: object
+      properties:
+        jobId:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        coverLetter:
+          type: ["string", "null"]
+        linkedinUrl:
+          type: ["string", "null"]
+        yearsOfExperience:
+          type: number
+      required: [jobId, firstName, lastName, email, phone, yearsOfExperience]
+
+    SubmissionResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        referenceId:
+          type: string
+      required: [success, message, referenceId]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]

@@ -1,0 +1,1 @@
+{"version":3,"file":"loanCalculationResult.d.ts","sourceRoot":"","sources":["../../../src/generated/types/loanCalculationResult.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,wBAAwB,CAAC;AAEnE,MAAM,WAAW,qBAAqB;IACpC,cAAc,EAAE,MAAM,CAAC;IACvB,YAAY,EAAE,MAAM,CAAC;IACrB,aAAa,EAAE,MAAM,CAAC;IACtB,QAAQ,EAAE,oBAAoB,EAAE,CAAC;CAClC"}
